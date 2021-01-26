@@ -28,6 +28,33 @@ mkisofs -J -T -o CentOS-8.2.2004-x86_64-custom-boot.iso -b isolinux/isolinux.bin
 
 ---
 
+label linux
+  menu label ^Install CentOS Linux 8
+  menu default
+  kernel vmlinuz
+  append initrd=initrd.img inst.stage2=hd:LABEL=CentOS-8-2-2004-x86_64-dvd inst.ks=http://1.2.3.4/centos_8_minimal_iso_custom_ks.cfg
+  
+mkisofs -J -T -o CentOS-8.2.2004-x86_64-custom-minimal.iso -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table -R -m TRANS.TBL -graft-point -V “CentOS-8-2-2004-x86_64-dvd” iso_custom
+  
+Note: 
+1. The iso volume ID has to match the LABEL used in isolinux.cfg
+2. To enable monitoring install progress via BMC SOL, add kernel option: console=ttyS1,115200n8
+3. Make sure file with name .treeinfo exist
+$ find . -name .treeinfo
+./iso_custom/.treeinfo
+
+inst.stage2=
+    Specifies the location of the installation program runtime image to be loaded. The syntax is the same as inst.repo. This option expects a path to a directory containing a valid .treeinfo file; the location of the runtime image will be read from this file if found. If a .treeinfo file is not available, Anaconda will try to load the image from LiveOS/squashfs.img. 
+
+inst.repo=
+    Specifies the installation source - that is, a location where the installation program can find the images and packages it requires, e.g., inst.repo=cdrom
+    
+console=
+    This kernel option specifies a device to be used as the primary console. For example, to use a console on the first serial port, use console=ttyS0. This option should be used along with the inst.text option.
+    You can use this option multiple times. In that case, the boot message will be displayed on all specified consoles, but only the last one will be used by the installation program afterwards. For example, if you specify console=ttyS0 console=ttyS1, the installation program will use ttyS1. 
+
+---
+
 iso_mnt
 ├── EFI
 │   └── BOOT
